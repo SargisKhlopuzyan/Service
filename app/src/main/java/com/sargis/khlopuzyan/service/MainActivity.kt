@@ -87,7 +87,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.weight(1f),
                 onClick = {
                     serviceStatus = "Service STARTED"
-                    val intent = Intent(context, MyService::class.java)
+//                    val intent = Intent(context, BlockingService::class.java)
+                    val intent = Intent(context, NonBlockingService::class.java)
                     context.startService(intent)
                 }
             ) {
@@ -102,7 +103,8 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 modifier = Modifier.weight(1f),
                 onClick = {
                     serviceStatus = "Service STOPPED"
-                    val intent = Intent(context, MyService::class.java)
+//                    val intent = Intent(context, BlockingService::class.java)
+                    val intent = Intent(context, NonBlockingService::class.java)
                     context.stopService(intent)
                 }
             ) {

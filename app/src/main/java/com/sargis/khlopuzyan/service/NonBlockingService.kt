@@ -4,14 +4,16 @@ import android.app.Service
 import android.content.Intent
 import android.os.IBinder
 
-class MyService : Service() {
+class NonBlockingService : Service() {
+
+    private var stopService = false
 
     override fun onBind(intent: Intent): IBinder {
         TODO("Return the communication channel to the service.")
     }
 
     override fun onCreate() {
-        eLog("onCreate")
+        log_e("onCreate")
         super.onCreate()
     }
 
@@ -20,26 +22,35 @@ class MyService : Service() {
         flags: Int,
         startId: Int,
     ): Int {
-        eLog("onStartCommand")
-        (0..10).forEach {
-            try {
-                Thread.sleep(1000)
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
+        val runnable = Runnable {
+            log_e("onStartCommand")
+            (0..10).forEach {
+                if (stopService) return@Runnable
+                try {
+                    Thread.sleep(1000)
+                } catch (e: InterruptedException) {
+                    e.printStackTrace()
+                }
+                log_e("onStartCommand - while : $it")
             }
-            eLog("onStartCommand - while : $it")
         }
+
+        val thread = Thread(runnable)
+        stopService = false
+        thread.start()
+
 //        return super.onStartCommand(intent, flags, startId)
         return START_NOT_STICKY
     }
 
     override fun onDestroy() {
-        eLog("onDestroy")
+        log_e("onDestroy")
+        stopService = true
         super.onDestroy()
     }
 
     override fun onTaskRemoved(rootIntent: Intent?) {
-        eLog("onTaskRemoved")
+        log_e("onTaskRemoved")
 //        onDestroy()
         super.onTaskRemoved(rootIntent)
     }
