@@ -1,10 +1,6 @@
-package com.sargis.khlopuzyan.service
+package com.sargis.khlopuzyan.service.ui.component
 
 import android.content.Intent
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,30 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.sargis.khlopuzyan.service.BlockingService
+import com.sargis.khlopuzyan.service.NonBlockingService
 import com.sargis.khlopuzyan.service.ui.theme.ServiceTheme
 
-class MainActivity : ComponentActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            ServiceTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    MainScreen(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .padding(innerPadding)
-                    )
-                }
-            }
-        }
-    }
-}
-
 @Composable
-fun MainScreen(modifier: Modifier = Modifier) {
+fun BlockingNonBlockingServiceScreen(
+    modifier: Modifier = Modifier,
+    isBlocking: Boolean,
+) {
 
     val context = LocalContext.current
 
@@ -88,7 +68,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 onClick = {
                     serviceStatus = "Service STARTED"
 //                    val intent = Intent(context, BlockingService::class.java)
-                    val intent = Intent(context, NonBlockingService::class.java)
+//                    val intent = Intent(context, NonBlockingService::class.java)
+                    val intent = if (isBlocking)
+                        Intent(context, BlockingService::class.java)
+                    else
+                        Intent(context, NonBlockingService::class.java)
                     context.startService(intent)
                 }
             ) {
@@ -104,7 +88,11 @@ fun MainScreen(modifier: Modifier = Modifier) {
                 onClick = {
                     serviceStatus = "Service STOPPED"
 //                    val intent = Intent(context, BlockingService::class.java)
-                    val intent = Intent(context, NonBlockingService::class.java)
+//                    val intent = Intent(context, NonBlockingService::class.java)
+                    val intent = if (isBlocking)
+                        Intent(context, BlockingService::class.java)
+                    else
+                        Intent(context, NonBlockingService::class.java)
                     context.stopService(intent)
                 }
             ) {
@@ -118,12 +106,13 @@ fun MainScreen(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun MainScreenPreview() {
+fun BlockingNonBlockingServiceScreenPreview() {
     ServiceTheme {
-        MainScreen(
+        BlockingNonBlockingServiceScreen(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(16.dp),
+            isBlocking = false
         )
     }
 }

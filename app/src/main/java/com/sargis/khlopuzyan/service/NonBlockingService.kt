@@ -3,6 +3,7 @@ package com.sargis.khlopuzyan.service
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
+import com.sargis.khlopuzyan.service.util.log_e
 
 class NonBlockingService : Service() {
 
