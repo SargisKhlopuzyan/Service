@@ -1,6 +1,10 @@
 package com.sargis.khlopuzyan.service.ui.component
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
+import android.os.IBinder
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,20 +26,50 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.sargis.khlopuzyan.service.BlockingService
-import com.sargis.khlopuzyan.service.NonBlockingService
+import com.sargis.khlopuzyan.service.BoundAndForegroundService
+import com.sargis.khlopuzyan.service.MyBoundService
 import com.sargis.khlopuzyan.service.ui.theme.ServiceTheme
 
 @Composable
-fun BlockingNonBlockingServiceScreen(
-    modifier: Modifier = Modifier,
-    isBlocking: Boolean,
-) {
+fun BoundAndForegroundServiceScreen(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
 
+    var myBoundService = remember {
+        MyBoundService()
+    }
+
+    var isConnected = remember {
+        false
+    }
+
+    var systemTime by remember {
+        mutableStateOf("System time here")
+    }
+
+    val serviceConnection: ServiceConnection = remember {
+        object : ServiceConnection {
+            override fun onServiceConnected(
+                name: ComponentName?,
+                service: IBinder,
+            ) {
+                val binder = service as MyBoundService.MyBinder
+                myBoundService = binder.getBoundService()
+                isConnected = true
+            }
+
+            override fun onServiceDisconnected(name: ComponentName?) {
+                isConnected = false
+            }
+        }
+    }
+
     var count by remember {
         mutableIntStateOf(0)
+    }
+
+    var serviceStatus by remember {
+        mutableStateOf("Service NOT STARTED")
     }
 
     Column(
@@ -44,10 +78,6 @@ fun BlockingNonBlockingServiceScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        var serviceStatus by remember {
-            mutableStateOf("Service NOT STARTED")
-        }
-
         Button(
             onClick = {
                 count++
@@ -55,6 +85,27 @@ fun BlockingNonBlockingServiceScreen(
         ) {
             Text(
                 text = "CLICK TO TEST UI: $count"
+            )
+        }
+
+        Button(
+            onClick = {
+                val intent = Intent(context, MyBoundService::class.java)
+                context.bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+            }
+        ) {
+            Text(
+                text = "BIND SERVICE"
+            )
+        }
+
+        Button(
+            onClick = {
+                context.unbindService(serviceConnection)
+            }
+        ) {
+            Text(
+                text = "UNBIND SERVICE"
             )
         }
 
@@ -67,10 +118,9 @@ fun BlockingNonBlockingServiceScreen(
                 modifier = Modifier.weight(1f),
                 onClick = {
                     serviceStatus = "Service STARTED"
-                    val intent = if (isBlocking)
-                        Intent(context, BlockingService::class.java)
-                    else
-                        Intent(context, NonBlockingService::class.java)
+                    val intent = Intent(context, BoundAndForegroundService::class.java)
+                    intent.action = BoundAndForegroundService.Actions.START.toString()
+//                    context.startForegroundService(intent)
                     context.startService(intent)
                 }
             ) {
@@ -85,10 +135,8 @@ fun BlockingNonBlockingServiceScreen(
                 modifier = Modifier.weight(1f),
                 onClick = {
                     serviceStatus = "Service STOPPED"
-                    val intent = if (isBlocking)
-                        Intent(context, BlockingService::class.java)
-                    else
-                        Intent(context, NonBlockingService::class.java)
+                    val intent = Intent(context, BoundAndForegroundService::class.java)
+                    intent.action = BoundAndForegroundService.Actions.STOP.toString()
                     context.stopService(intent)
                 }
             ) {
@@ -97,18 +145,32 @@ fun BlockingNonBlockingServiceScreen(
                 )
             }
         }
+
+        Text(
+            text = systemTime
+        )
+
+        Button(
+            onClick = {
+                val time = myBoundService.getSystemTime()
+                systemTime = time
+            }
+        ) {
+            Text(
+                text = "GET SYSTEM TIME"
+            )
+        }
     }
 }
 
 @Preview(showBackground = true)
 @Composable
-fun BlockingNonBlockingServiceScreenPreview() {
+fun BoundAndForegroundServiceScreenPreview() {
     ServiceTheme {
-        BlockingNonBlockingServiceScreen(
+        BoundAndForegroundServiceScreen(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            isBlocking = false
+                .padding(16.dp)
         )
     }
 }

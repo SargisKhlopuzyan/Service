@@ -26,7 +26,7 @@ import com.sargis.khlopuzyan.service.MyBoundService
 import com.sargis.khlopuzyan.service.ui.theme.ServiceTheme
 
 @Composable
-fun BoundedServiceScreen(modifier: Modifier = Modifier) {
+fun BoundServiceScreen(modifier: Modifier = Modifier) {
 
     val context = LocalContext.current
 
@@ -119,9 +119,9 @@ fun BoundedServiceScreen(modifier: Modifier = Modifier) {
 
 @Preview(showBackground = true)
 @Composable
-fun BoundedServiceScreenPreview() {
+fun BoundServiceScreenPreview() {
     ServiceTheme {
-        BoundedServiceScreen(
+        BoundServiceScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
