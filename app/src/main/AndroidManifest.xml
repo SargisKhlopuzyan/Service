@@ -17,6 +17,9 @@
         android:theme="@style/Theme.Service"
         tools:targetApi="31">
         <service
+            android:name=".MyIntentService"
+            android:exported="false"></service>
+        <service
             android:name=".BoundAndForegroundService"
             android:enabled="true"
             android:exported="true"

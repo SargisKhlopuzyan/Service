@@ -15,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import com.sargis.khlopuzyan.service.ui.component.BlockingNonBlockingServiceScreen
 import com.sargis.khlopuzyan.service.ui.component.BoundAndForegroundServiceScreen
 import com.sargis.khlopuzyan.service.ui.component.BoundServiceScreen
+import com.sargis.khlopuzyan.service.ui.component.IntentServiceScreen
 import com.sargis.khlopuzyan.service.ui.theme.ServiceTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,7 +35,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             ServiceTheme {
                 Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
-                    val screenMode = ScreenMode.BOUND_AND_FOREGROUND_SERVICE
+                    val screenMode = ScreenMode.INTENT_SERVICE
                     if (screenMode == ScreenMode.BOUND_SERVICE) {
                         BoundServiceScreen(
                             modifier = Modifier.Companion
@@ -44,6 +45,13 @@ class MainActivity : ComponentActivity() {
                         )
                     } else if (screenMode == ScreenMode.BOUND_AND_FOREGROUND_SERVICE) {
                         BoundAndForegroundServiceScreen(
+                            modifier = Modifier.Companion
+                                .fillMaxSize()
+                                .padding(16.dp)
+                                .padding(innerPadding)
+                        )
+                    } else if (screenMode == ScreenMode.INTENT_SERVICE) {
+                        IntentServiceScreen(
                             modifier = Modifier.Companion
                                 .fillMaxSize()
                                 .padding(16.dp)
@@ -68,5 +76,6 @@ enum class ScreenMode {
     BOUND_SERVICE,
     BOUND_AND_FOREGROUND_SERVICE,
     BLOCKING_SERVICE,
-    NON_BLOCKING_SERVICE
+    NON_BLOCKING_SERVICE,
+    INTENT_SERVICE
 }
